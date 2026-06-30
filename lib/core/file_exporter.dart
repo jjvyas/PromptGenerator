@@ -1,5 +1,5 @@
-﻿import 'dart:convert';
-import 'dart:js' as js;
+import 'dart:convert';
+import 'file_saver.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -11,26 +11,11 @@ class FileExporter {
     required String filename,
     required String mimeType,
   }) {
-    final base64Data = base64Encode(bytes);
-    js.context.callMethod('eval', ['''
-      (function(base64, filename, mimeType) {
-        const byteCharacters = atob(base64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], {type: mimeType});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      })("$base64Data", "$filename", "$mimeType")
-    ''']);
+    FileSaver.saveBytes(
+      bytes: bytes,
+      fileName: filename,
+      mimeType: mimeType,
+    );
   }
 
   /// Downloads plain text or markdown contents.
